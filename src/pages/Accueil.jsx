@@ -1,12 +1,15 @@
 import { useState } from "react";
-import ArticleCard from "../components/ArticleCard";
-import { articlesDeTest } from "../donnees-test";
+import BarreRecherche from "../components/BarreRecherche";
+import ListeArticles from "../components/ListeArticles";
+import ListeCommentaires from "../components/ListeCommentaires";
+import CommentaireForm from "../components/CommentaireForm";
+import { articlesDeTest, commentairesDeTest } from "../donnees-test";
 
 export default function Accueil() {
-  // Liste des id des articles mis en favori (vide au départ)
   const [favoris, setFavoris] = useState([]);
+  const [recherche, setRecherche] = useState("");
+  const [commentaires, setCommentaires] = useState(commentairesDeTest);
 
-  // Ajoute l'id s'il n'y est pas, le retire s'il y est déjà
   function basculerFavori(id) {
     if (favoris.includes(id)) {
       setFavoris(favoris.filter((idFavori) => idFavori !== id));
@@ -15,26 +18,35 @@ export default function Accueil() {
     }
   }
 
+  function ajouterCommentaire(nom, message) {
+    const nouveauCommentaire = {
+      id: Date.now(),
+      postId: 1,
+      name: nom,
+      body: message,
+    };
+    setCommentaires([...commentaires, nouveauCommentaire]);
+  }
+
+  const articlesAffiches = articlesDeTest.filter((article) =>
+    article.title.toLowerCase().includes(recherche.toLowerCase())
+  );
+
   return (
     <div>
       <h1>Bienvenue sur Teranga Blog</h1>
       <p>Articles en favori : {favoris.length}</p>
 
-      <ArticleCard
-        article={articlesDeTest[0]}
-        estFavori={favoris.includes(articlesDeTest[0].id)}
+      <BarreRecherche recherche={recherche} onChangerRecherche={setRecherche} />
+
+      <ListeArticles
+        articles={articlesAffiches}
+        favoris={favoris}
         onBasculerFavori={basculerFavori}
       />
-      <ArticleCard
-        article={articlesDeTest[1]}
-        estFavori={favoris.includes(articlesDeTest[1].id)}
-        onBasculerFavori={basculerFavori}
-      />
-      <ArticleCard
-        article={articlesDeTest[2]}
-        estFavori={favoris.includes(articlesDeTest[2].id)}
-        onBasculerFavori={basculerFavori}
-      />
+
+      <ListeCommentaires commentaires={commentaires} />
+      <CommentaireForm onAjouter={ajouterCommentaire} />
     </div>
   );
 }
