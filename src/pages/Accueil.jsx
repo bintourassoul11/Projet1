@@ -3,12 +3,15 @@ import BarreRecherche from "../components/BarreRecherche";
 import ListeArticles from "../components/ListeArticles";
 import ListeCommentaires from "../components/ListeCommentaires";
 import CommentaireForm from "../components/CommentaireForm";
+import Article from "./Article";
+import Auteur from "./Auteur";
 import { articlesDeTest, commentairesDeTest } from "../donnees-test";
 
 export default function Accueil() {
   const [favoris, setFavoris] = useState([]);
   const [recherche, setRecherche] = useState("");
   const [commentaires, setCommentaires] = useState(commentairesDeTest);
+  const [idTest, setIdTest] = useState(1);
 
   function basculerFavori(id) {
     if (favoris.includes(id)) {
@@ -47,6 +50,20 @@ export default function Accueil() {
 
       <ListeCommentaires commentaires={commentaires} />
       <CommentaireForm onAjouter={ajouterCommentaire} />
+
+      <hr />
+      <button className="bouton" onClick={() => setIdTest(idTest + 1)}>
+        Suivant
+      </button>
+      <button className="bouton secondaire" onClick={() => setIdTest(999)}>
+        Id inexistant
+      </button>
+      <button className="bouton secondaire" onClick={() => setIdTest(1)}>
+        Revenir à 1
+      </button>
+      <Article id={idTest} />
+      <hr />
+      <Auteur id={idTest} />
     </div>
   );
 }
