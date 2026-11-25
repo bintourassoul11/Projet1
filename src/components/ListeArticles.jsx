@@ -7,7 +7,7 @@ export default function ListeArticles({ articles, favoris, onBasculerFavori }) {
         <ArticleCard
           key={article.id}
           article={article}
-          estFavori={favoris.includes(article.id)}
+          estFavori={favoris.some((favori) => favori.id === article.id)}
           onBasculerFavori={onBasculerFavori}
         />
       ))}

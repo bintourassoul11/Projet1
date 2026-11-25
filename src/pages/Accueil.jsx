@@ -1,69 +1,50 @@
-import { useState } from "react";
-import BarreRecherche from "../components/BarreRecherche";
+import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router";
+import { API_URL } from "../constants";
+import EtatRequete from "../components/EtatRequete";
 import ListeArticles from "../components/ListeArticles";
-import ListeCommentaires from "../components/ListeCommentaires";
-import CommentaireForm from "../components/CommentaireForm";
-import Article from "./Article";
-import Auteur from "./Auteur";
-import { articlesDeTest, commentairesDeTest } from "../donnees-test";
 
 export default function Accueil() {
-  const [favoris, setFavoris] = useState([]);
-  const [recherche, setRecherche] = useState("");
-  const [commentaires, setCommentaires] = useState(commentairesDeTest);
-  const [idTest, setIdTest] = useState(1);
+  const { favoris, basculerFavori } = useOutletContext();
+  const [articles, setArticles] = useState([]);
+  const [chargement, setChargement] = useState(true);
+  const [erreur, setErreur] = useState(null);
 
-  function basculerFavori(id) {
-    if (favoris.includes(id)) {
-      setFavoris(favoris.filter((idFavori) => idFavori !== id));
-    } else {
-      setFavoris([...favoris, id]);
-    }
-  }
+  useEffect(() => {
+    const controleur = new AbortController();
 
-  function ajouterCommentaire(nom, message) {
-    const nouveauCommentaire = {
-      id: Date.now(),
-      postId: 1,
-      name: nom,
-      body: message,
-    };
-    setCommentaires([...commentaires, nouveauCommentaire]);
-  }
+    fetch(`${API_URL}/posts?_limit=6`, { signal: controleur.signal })
+      .then((reponse) => {
+        if (!reponse.ok) {
+          throw new Error("Erreur " + reponse.status);
+        }
+        return reponse.json();
+      })
+      .then((donnees) => {
+        setArticles(donnees);
+        setChargement(false);
+      })
+      .catch((e) => {
+        if (e.name === "AbortError") return;
+        setErreur("Impossible de charger les derniers articles.");
+        setChargement(false);
+      });
 
-  const articlesAffiches = articlesDeTest.filter((article) =>
-    article.title.toLowerCase().includes(recherche.toLowerCase())
-  );
+    return () => controleur.abort();
+  }, []);
 
   return (
     <div>
       <h1>Bienvenue sur Teranga Blog</h1>
-      <p>Articles en favori : {favoris.length}</p>
+      <p>Découvrez les derniers articles de la communauté Teranga Academy.</p>
 
-      <BarreRecherche recherche={recherche} onChangerRecherche={setRecherche} />
-
-      <ListeArticles
-        articles={articlesAffiches}
-        favoris={favoris}
-        onBasculerFavori={basculerFavori}
-      />
-
-      <ListeCommentaires commentaires={commentaires} />
-      <CommentaireForm onAjouter={ajouterCommentaire} />
-
-      <hr />
-      <button className="bouton" onClick={() => setIdTest(idTest + 1)}>
-        Suivant
-      </button>
-      <button className="bouton secondaire" onClick={() => setIdTest(999)}>
-        Id inexistant
-      </button>
-      <button className="bouton secondaire" onClick={() => setIdTest(1)}>
-        Revenir à 1
-      </button>
-      <Article id={idTest} />
-      <hr />
-      <Auteur id={idTest} />
+      <EtatRequete chargement={chargement} erreur={erreur}>
+        <ListeArticles
+          articles={articles}
+          favoris={favoris}
+          onBasculerFavori={basculerFavori}
+        />
+      </EtatRequete>
     </div>
   );
 }

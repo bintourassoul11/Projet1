@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { API_URL } from "../constants";
 import EtatRequete from "../components/EtatRequete";
 
@@ -38,7 +39,9 @@ export default function Auteurs() {
         <div className="grille">
           {auteurs.map((auteur) => (
             <div className="carte" key={auteur.id}>
-              <h3>{auteur.name}</h3>
+              <h3>
+                <Link to={`/auteurs/${auteur.id}`}>{auteur.name}</Link>
+              </h3>
               <p className="discret">@{auteur.username}</p>
               <p>{auteur.email}</p>
               <p className="discret">{auteur.company.name}</p>

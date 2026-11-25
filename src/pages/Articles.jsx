@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router";
 import { API_URL } from "../constants";
 import EtatRequete from "../components/EtatRequete";
 import BarreRecherche from "../components/BarreRecherche";
 import ListeArticles from "../components/ListeArticles";
 
 export default function Articles() {
+  const { favoris, basculerFavori } = useOutletContext();
   const [articles, setArticles] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
   const [recherche, setRecherche] = useState("");
-  const [favoris, setFavoris] = useState([]);
 
   useEffect(() => {
     const controleur = new AbortController();
@@ -34,14 +35,6 @@ export default function Articles() {
     return () => controleur.abort();
   }, []);
 
-  function basculerFavori(id) {
-    if (favoris.includes(id)) {
-      setFavoris(favoris.filter((idFavori) => idFavori !== id));
-    } else {
-      setFavoris([...favoris, id]);
-    }
-  }
-
   const articlesAffiches = articles.filter((article) =>
     article.title.toLowerCase().includes(recherche.toLowerCase())
   );
@@ -49,7 +42,6 @@ export default function Articles() {
   return (
     <div>
       <h1>Articles</h1>
-      <p>Articles en favori : {favoris.length}</p>
 
       <BarreRecherche recherche={recherche} onChangerRecherche={setRecherche} />
 

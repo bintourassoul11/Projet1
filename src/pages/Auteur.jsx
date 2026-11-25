@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router";
 import { API_URL } from "../constants";
 import EtatRequete from "../components/EtatRequete";
 
-export default function Auteur({ id }) {
+export default function Auteur() {
+  const { id } = useParams();
   const [auteur, setAuteur] = useState(null);
   const [articles, setArticles] = useState([]);
   const [chargement, setChargement] = useState(true);
@@ -39,6 +41,8 @@ export default function Auteur({ id }) {
 
   return (
     <div>
+      <Link to="/auteurs">← Retour aux auteurs</Link>
+
       <EtatRequete chargement={chargement} erreur={erreur}>
         {auteur && (
           <div>
@@ -52,7 +56,9 @@ export default function Auteur({ id }) {
             <div className="grille">
               {articles.map((article) => (
                 <div className="carte" key={article.id}>
-                  <h3>{article.title}</h3>
+                  <h3>
+                    <Link to={`/articles/${article.id}`}>{article.title}</Link>
+                  </h3>
                   <p>{article.body}</p>
                 </div>
               ))}
